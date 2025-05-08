@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผลการเลือกตั้งเทศบาลเมืองพิชัย (อย่างไม่เป็นทางการ)</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f7fafc; }
+        .header-banner { background-color: #1e3a8a; color: white; padding: 2rem 1rem; text-align: center; }
+        .header-banner h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header-banner p { font-size: 1.1rem; }
+        .content-section { background-color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .section-title { font-size: 1.5rem; font-weight: 600; color: #1e3a8a; margin-bottom: 1rem; border-bottom: 2px solid #bfdbfe; padding-bottom: 0.5rem; }
+        .table-official { width: 100%; border-collapse: collapse; }
+        .table-official th, .table-official td { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; text-align: left; }
+        .table-official th { background-color: #f3f4f6; font-weight: 600; font-size: 0.875rem; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; }
+        .table-official tbody tr:nth-child(even) { background-color: #f9fafb; }
+        .table-official tbody tr:hover { background-color: #eff6ff; }
+        .button-official { display: inline-block; padding: 0.6rem 1.2rem; background-color: #2563eb; color: white; border-radius: 0.375rem; text-decoration: none; font-weight: 500; transition: background-color 0.2s ease-in-out; }
+        .button-official:hover { background-color: #1d4ed8; }
+
+        /* สไตล์สำหรับแท็บเลือกเขต */
+        #zone-buttons {
+            border-bottom: 1px solid #d1d5db;
+        }
+        .zone-tab-button {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-bottom-color: #d1d5db;
+            border-radius: 0.375rem 0.375rem 0 0;
+            margin-right: 0.25rem;
+            margin-bottom: -1px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+        }
+        .zone-tab-button:hover {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+        .zone-tab-button.active {
+            background-color: white;
+            color: #1e3a8a;
+            font-weight: 600;
+            border-color: #d1d5db;
+            border-bottom-color: white;
+            z-index: 1;
+        }
+        #zone-contents {
+            min-height: 350px; /* หรือค่าที่เหมาะสม */
+        }
+
+        .site-footer { text-align: center; padding: 2rem 1rem; margin-top: 2rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #6b7280; }
+        .mayor-card-official { border: 1px solid #d1d5db; transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out; }
+        .mayor-card-official:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .mayor-card-official img {
+            border: 3px solid #bfdbfe;
+            width: 120px; 
+            height: 120px; 
+            object-fit: cover; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* สไตล์สำหรับชื่อผู้สมัครนายก (ถ้าต้องการปรับเพิ่มเติมจาก Tailwind) */
+        .mayor-card-official h3 {
+            font-size: 1.1rem; 
+            font-weight: 600;
+            color: #1f2937; 
+        }
+        /* สไตล์ใหม่สำหรับหมายเลขผู้สมัครนายก (ใต้ชื่อ) */
+        .mayor-number-display {
+            font-size: 2rem; /* << ปรับขนาดตัวอักษรหมายเลขตรงนี้ */
+            font-weight: 700;   
+            color: #4f46e5;     
+            margin-top: 0.25rem; 
+        }
+        .mayor-card-official .score-value { 
+            color: #1e3a8a; 
+            font-size: 4rem; /* << ปรับขนาดตัวเลขคะแนนตรงนี้ */
+            font-weight: 700; 
+        }
+
+        /* CSS for S.T. Candidate Row Animation */
+        .candidate-row {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .candidate-row.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="header-banner">
+        <h1 id="election-title">ผลการเลือกตั้งเทศบาลเมืองพิชัย (อย่างไม่เป็นทางการ)</h1>
+        <p id="current-time">กำลังโหลดเวลา...</p>
+    </header>
+
+    <main class="container mx-auto px-4 py-6">
+        <!-- Section: Mayor Results -->
+        <section id="mayor-results" class="content-section">
+            <h2 class="section-title">ผลคะแนนเลือกตั้งนายกเทศมนตรี (อย่างไม่เป็นทางการ)</h2>
+            <div id="mayor-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Mayor cards will be inserted here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Section: Council Member Results -->
+        <section id="council-results" class="content-section mt-6">
+            <h2 class="section-title">ผลคะแนนสมาชิกสภาเทศบาล (อย่างไม่เป็นทางการ)</h2>
+            <div id="zone-buttons" class="flex flex-wrap -mb-px pb-2 border-b border-gray-200">
+                <!-- Zone tab buttons will be inserted here -->
+            </div>
+            <div id="zone-contents" class="mt-0 p-4 bg-white relative overflow-x-auto" style="min-height: 350px;">
+                <!-- Zone content (tables) will be inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; <span id="current-year-footer">2024</span> เทศบาลเมืองพิชัย. สงวนลิขสิทธิ์</p>
+        <p>ข้อมูลนี้เป็นการรายงานผลอย่างไม่เป็นทางการ โปรดรอผลการยืนยันจากคณะกรรมการการเลือกตั้ง</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('current-year-footer').textContent = new Date().getFullYear() + 543;
+    </script>
+</body>
+</html>

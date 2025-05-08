@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Election Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .button-official { /* Base style for official-looking buttons */
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 500; /* medium */
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-out;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+        }
+        .button-primary {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white;
+        }
+        .button-primary:hover {
+            background-color: #4338ca; /* hover:bg-indigo-700 */
+        }
+        .button-secondary {
+            background-color: #e5e7eb; /* bg-gray-200 */
+            color: #374151; /* text-gray-700 */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+        }
+        .button-secondary:hover {
+            background-color: #d1d5db; /* hover:bg-gray-300 */
+        }
+        .button-pressed {
+            transform: scale(0.95);
+            opacity: 0.8;
+            transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+        }
+        .admin-zone-tab.bg-indigo-50 { /* Active admin tab style */
+            font-weight: 600;
+        }
+        input[type="number"] {
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto p-4 md:p-6">
+        <header class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-700">หน้าจัดการข้อมูลผลการเลือกตั้ง</h1>
+        </header>
+
+        <!-- Mayors Score Management -->
+        <section class="mb-8 p-4 bg-white rounded-lg shadow">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">จัดการคะแนนผู้สมัครนายกเทศมนตรี</h2>
+            <div id="admin-mayor-list" class="space-y-4">
+                <!-- Admin mayor list will be injected here -->
+                <p class="text-gray-500">กำลังโหลดข้อมูล...</p>
+            </div>
+        </section>
+
+        <!-- Council Members (S.T.) Score Management -->
+        <section class="mb-8 p-4 bg-white rounded-lg shadow">
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">จัดการคะแนนผู้สมัครสมาชิกสภา (สท.)</h2>
+            <div id="zone-tabs" class="flex flex-wrap gap-2 mb-4">
+                <!-- Admin zone tabs will be injected here -->
+                <p class="text-sm text-gray-500">กำลังโหลดเขต...</p>
+            </div>
+            <div id="admin-zone-content" class="space-y-3">
+                <!-- Admin S.T. candidate list for selected zone -->
+                <p class="text-gray-500">กรุณาเลือกเขตด้านบน</p>
+            </div>
+        </section>
+
+        <!-- Election Statistics Management -->
+        <section class="p-4 bg-white rounded-lg shadow">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">จัดการสถิติการเลือกตั้ง</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="admin-totalEligibleVoters" class="block text-sm font-medium text-gray-700">จำนวนผู้มีสิทธิ์เลือกตั้งทั้งหมด</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-totalEligibleVoters" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('totalEligibleVoters')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="admin-totalPollingStations" class="block text-sm font-medium text-gray-700">จำนวนหน่วยเลือกตั้งทั้งหมด</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-totalPollingStations" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('totalPollingStations')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="admin-actualVoters" class="block text-sm font-medium text-gray-700">จำนวนผู้มาใช้สิทธิ์</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-actualVoters" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('actualVoters')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="admin-validBallots" class="block text-sm font-medium text-gray-700">จำนวนบัตรดี</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-validBallots" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('validBallots')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="admin-invalidBallots" class="block text-sm font-medium text-gray-700">จำนวนบัตรเสีย</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-invalidBallots" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('invalidBallots')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="admin-noVoteBallots" class="block text-sm font-medium text-gray-700">จำนวนบัตรไม่ประสงค์ลงคะแนน</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="admin-noVoteBallots" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2" min="0">
+                        <button onclick="animateButtonPressed(this); updateElectionStat('noVoteBallots')" class="button-official button-secondary px-3 rounded-l-none rounded-r-md">อัปเดต</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-12 text-center text-sm text-gray-500">
+            <p>&copy; <span id="current-year-footer-admin">2024</span> Election Admin Panel</p>
+        </footer>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Your custom script -->
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('current-year-footer-admin').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ข้อมูลผู้มีสิทธิ์เลือกตั้ง - เทศบาลเมืองพิชัย</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS ทั่วไปที่ให้ไว้ด้านบน */
+    body {font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; color: #1f2937; line-height: 1.6;}
+    .site-header {background-color: #1e3a8a; color: white; padding: 1.5rem 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+    .site-header h1 {font-size: 1.75rem; font-weight: 700;}
+    .site-header p {font-size: 0.9rem; opacity: 0.8;}
+    .content-wrapper {max-width: 900px; margin: 2rem auto; padding: 0 1rem;} /* Narrower for info page */
+    .info-card {background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); border: 1px solid #e5e7eb; margin-bottom: 1.5rem;}
+    .card-header {padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb;}
+    .card-header h2, .card-header h3 {font-size: 1.25rem; font-weight: 600; color: #111827;}
+    .card-content {padding: 1.5rem;}
+    .button-official {display: inline-block; padding: 0.6rem 1.2rem; background-color: #2563eb; color: white; border-radius: 0.375rem; text-decoration: none; font-weight: 500; transition: background-color 0.2s ease-in-out;}
+    .button-official:hover {background-color: #1d4ed8;}
+    .button-secondary {background-color: #e5e7eb; color: #1f2937;}
+    .button-secondary:hover {background-color: #d1d5db;}
+    .site-footer {text-align: center; padding: 2rem 1rem; margin-top: 2rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #6b7280;}
+    .main-stat-card {background-color: #e0f2fe; border: 2px solid #7dd3fc; padding: 2.5rem; text-align: center; border-radius: 0.5rem; margin-bottom: 2rem;}
+    .main-stat-card .stat-title {font-size: 1.5rem; font-weight: 600; color: #0c4a6e; margin-bottom: 0.75rem;}
+    .main-stat-card .stat-value {font-size: 3.75rem; font-weight: 700; color: #f90c0c;}
+    .stat-item {
+        background-color: #f9fafb; /* bg-gray-50 */
+        padding: 1.25rem;
+        border-radius: 0.5rem; /* rounded-lg */
+        border: 1px solid #e5e7eb; /* border-gray-200 */
+        text-align: center;
+    }
+    .stat-item .stat-label {
+        font-size: 0.9rem; /* text-sm */
+        color: #4b5563; /* text-gray-600 */
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+    .stat-item .stat-data {
+        font-size: 1.875rem; /* text-3xl */
+        font-weight: 700; /* font-bold */
+    }
+    .stat-item .stat-percentage {
+        font-size: 0.8rem;
+        color: #6b7280; /* text-gray-500 */
+        margin-top: 0.1rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header text-center">
+    <h1>ข้อมูลและสถิติการเลือกตั้งเทศบาลเมืองพิชัย</h1>
+    <p>ภาพรวมข้อมูลสำคัญเกี่ยวกับการเลือกตั้ง</p>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="text-center mb-8">
+        <a href="index.html" class="button-official button-secondary">&larr; กลับไปหน้าผลคะแนน</a>
+    </div>
+
+    <!-- จำนวนผู้มีสิทธิ์เลือกตั้งทั้งหมด -->
+    <section class="main-stat-card">
+        <h2 class="stat-title">จำนวนผู้มีสิทธิ์เลือกตั้งทั้งหมด</h2>
+        <p id="total-eligible-voters" class="stat-value">รอข้อมูล</p>
+    </section>
+
+    <!-- สถิติการใช้สิทธิ์ -->
+    <section class="info-card">
+        <div class="card-header">
+            <h3>สถิติการใช้สิทธิ์เลือกตั้ง</h3>
+        </div>
+        <div class="card-content">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div class="stat-item">
+                    <span class="stat-label">จำนวนผู้มาใช้สิทธิ์</span>
+                    <p id="actual-voters" class="stat-data text-green-600">รอข้อมูล</p>
+                    <p class="stat-percentage">(ร้อยละ <span id="voter-turnout-percentage" class="font-semibold">รอคำนวณ</span>)</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">จำนวนบัตรดี</span>
+                    <p id="valid-ballots" class="stat-data text-blue-600">รอข้อมูล</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">จำนวนบัตรเสีย</span>
+                    <p id="invalid-ballots" class="stat-data text-red-600">รอข้อมูล</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">บัตรไม่ประสงค์ลงคะแนน</span>
+                    <p id="no-vote-ballots" class="stat-data text-yellow-600">รอข้อมูล</p>
+                </div>
+            </div>
+        </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>&copy; พ.ศ. <span id="current-year">2567</span> เทศบาลเมืองพิชัย. สงวนลิขสิทธิ์</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
