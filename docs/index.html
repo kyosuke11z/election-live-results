@@ -12,7 +12,7 @@
         body { font-family: 'Sarabun', sans-serif; background-color: #f7fafc; }
         .header-banner { background-color: #1e3a8a; color: white; padding: 2rem 1rem; text-align: center; }
         .header-banner h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .header-banner p { font-size: 1.1rem; }
+        /*.header-banner p { font-size: 1.1rem; }*/
         .content-section { background-color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .section-title { font-size: 1.5rem; font-weight: 600; color: #1e3a8a; margin-bottom: 1rem; border-bottom: 2px solid #bfdbfe; padding-bottom: 0.5rem; }
         .table-official { width: 100%; border-collapse: collapse; }
@@ -98,12 +98,18 @@
             opacity: 1;
             transform: translateX(0);
         }
+
+        /* Custom style for S.T. table data cells font size */
+        #zone-contents .table-official td {
+            font-size: 5rem; /* เทียบเท่า text-lg ของ Tailwind (18px), ปรับค่าได้ตามต้องการ */
+            /* อาจจะต้องปรับ padding เล็กน้อยถ้าตัวอักษรดูอึดอัดไป */
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
     <header class="header-banner">
         <h1 id="election-title">ผลการเลือกตั้งเทศบาลเมืองพิชัย (อย่างไม่เป็นทางการ)</h1>
-        <p id="current-time">กำลังโหลดเวลา...</p>
+        <p id="current-time" class="text-4xl text-yellow-400">วันที่ 11 พฤษภาคม 2568 กำลังโหลดเวลา...</p>
     </header>
 
     <main class="container mx-auto px-4 py-6">
