@@ -85,9 +85,19 @@ function initializePublicPage() {
 }
 
 function updateCurrentTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-    updateElementText('current-time', `เวลา ${timeString} น.`);
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        const now = new Date();
+        // จัดรูปแบบเวลาตามต้องการ เช่น HH:MM:SS
+        const timeString = now.toLocaleTimeString('th-TH', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        
+        // แก้ไขบรรทัดนี้เพื่อแสดงผลตามรูปแบบใหม่
+        timeElement.textContent = `วันที่ 11 พฤษภาคม 2568 ${timeString}`; 
+    }
 }
 
 function updateMayorsUI(mayorsData) {
