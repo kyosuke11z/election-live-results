@@ -78,17 +78,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("displayMayors called with (Array):", mayorsArray);
 
         const validMayorsArray = mayorsArray.filter(mayor => typeof mayor === 'object' && mayor !== null);
-        const sortedMayors = [...validMayorsArray]
-            .sort((a, b) => (b.score || 0) - (a.score || 0));
+        
+        // REMOVED: Sorting by score to prevent position changes on score update.
+        // const sortedMayors = [...validMayorsArray] 
+        //     .sort((a, b) => (b.score || 0) - (a.score || 0));
+        const mayorsToDisplay = [...validMayorsArray]; // Use the array as is (or sort by number if preferred and 'number' exists)
 
-        if (sortedMayors.length === 0) {
+        if (mayorsToDisplay.length === 0) {
             mayorListElement.innerHTML = '<p class="text-center col-span-full text-gray-500">ไม่มีข้อมูลผู้สมัครนายกเทศมนตรี</p>';
-            console.log("displayMayors: No valid mayor objects to display after processing and sorting.");
+            console.log("displayMayors: No valid mayor objects to display after processing.");
             return;
         }
 
         const fragment = document.createDocumentFragment();
-        sortedMayors.forEach(mayor => {
+        mayorsToDisplay.forEach(mayor => {
             const div = document.createElement('div');
             div.className = 'mayor-card-official bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center';
             const placeholderImage = 'img_placeholder_person.png';
@@ -337,9 +340,14 @@ function loadAdminMayorList() {
         adminMayorList.innerHTML = '';
         const mayors = snapshot.val();
         if (Array.isArray(mayors)) {
-            const sortedMayorsAdmin = [...mayors].sort((a,b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
+            // Display mayors in the order they appear in the Firebase array for admin page,
+            // or sort by number if that's preferred for admin.
+            // For consistency with the public page (no reordering), we'll keep the Firebase order.
+            const mayorsToDisplayAdmin = [...mayors]; 
+            // If sorting by number is desired for admin:
+            // const mayorsToDisplayAdmin = [...mayors].sort((a,b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
             
-            sortedMayorsAdmin.forEach((mayor, index) => {
+            mayorsToDisplayAdmin.forEach((mayor, index) => {
                 const mayorIdForAdmin = mayor.number || index;
                 const dbPathForMayorScore = `mayors/${index}/score`;
 
