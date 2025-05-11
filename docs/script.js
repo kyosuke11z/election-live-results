@@ -77,11 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mayorListElement.innerHTML = '';
         console.log("displayMayors called with (Array):", mayorsArray);
 
-        // Data is already an array, so just sort it.
-        // Ensure all items are objects before sorting.
         const validMayorsArray = mayorsArray.filter(mayor => typeof mayor === 'object' && mayor !== null);
-
-        const sortedMayors = [...validMayorsArray] // Create a shallow copy before sorting
+        const sortedMayors = [...validMayorsArray]
             .sort((a, b) => (b.score || 0) - (a.score || 0));
 
         if (sortedMayors.length === 0) {
@@ -94,10 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortedMayors.forEach(mayor => {
             const div = document.createElement('div');
             div.className = 'mayor-card-official bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center';
-            // Use mayor.imageUrl (capital L)
-            // IMPORTANT: Replace 'YOUR_DEFAULT_EXTERNAL_IMAGE_URL.jpg' with an actual URL if you want a default online image.
-            // If you have a local 'img_placeholder_person.png' in the same folder as index.html, you can use that.
-            const placeholderImage = 'img_placeholder_person.png'; // Or 'YOUR_DEFAULT_EXTERNAL_IMAGE_URL.jpg'
+            const placeholderImage = 'img_placeholder_person.png';
             div.innerHTML = `
                 <img src="${mayor.imageUrl || placeholderImage}" alt="${mayor.name || 'ผู้สมัคร'}" class="rounded-full w-24 h-24 md:w-32 md:h-32 object-cover mb-4 border-4 border-blue-300" onerror="this.onerror=null;this.src='${placeholderImage}';">
                 <h3 class="text-md md:text-lg font-semibold text-gray-800 mb-1">${mayor.name || 'N/A'}</h3>
@@ -115,23 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Council Members (S.T.) Data ---
     const councilZoneButtonsContainer = document.getElementById('zone-buttons');
     const councilZoneContentsContainer = document.getElementById('zone-contents');
-    let councilZonesDataCache = []; // Data is an array of zones [null, zone1Array, zone2Array, ...]
-    let activeZoneId = null; // Will now be an index (1, 2, 3...)
+    let councilZonesDataCache = [];
+    let activeZoneId = null;
 
     if (councilZoneButtonsContainer && councilZoneContentsContainer) {
         console.log("Council zone elements found. Attaching Firebase listener for 'zones'.");
-        database.ref('zones').on('value', (snapshot) => { // Changed path to 'zones'
+        database.ref('zones').on('value', (snapshot) => {
             console.log("Firebase 'zones' data received snapshot:", snapshot);
             const zonesData = snapshot.val();
             console.log("Raw council_zones data (from 'zones' path) from Firebase:", zonesData);
 
-            if (Array.isArray(zonesData) && zonesData.length > 1) { // Check if it's an array and has more than the initial null
-                councilZonesDataCache = zonesData; // Store the whole array, including the null at index 0
+            if (Array.isArray(zonesData) && zonesData.length > 1) {
+                councilZonesDataCache = zonesData;
                 console.log("Processing council_zones data (Array):", councilZonesDataCache);
 
                 const availableZoneIndices = [];
-                for (let i = 1; i < councilZonesDataCache.length; i++) { // Start from 1 to skip the null at index 0
-                    if (councilZonesDataCache[i]) { // Ensure the zone data itself is not null/undefined
+                for (let i = 1; i < councilZonesDataCache.length; i++) {
+                    if (councilZonesDataCache[i]) {
                         availableZoneIndices.push(i);
                     }
                 }
@@ -146,13 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Initial activeZoneId: ${activeZoneId}, currentActiveZoneIsValid: ${currentActiveZoneIsValid}`);
 
                 if (!currentActiveZoneIsValid && availableZoneIndices.length > 0) {
-                    activeZoneId = availableZoneIndices[0]; // Default to the first valid zone index
+                    activeZoneId = availableZoneIndices[0];
                     console.log("Defaulting activeZoneId to index:", activeZoneId);
                 }
 
                 if (activeZoneId !== null && councilZonesDataCache[activeZoneId]) {
                     console.log("Attempting to display/update zone with index:", activeZoneId, "and data:", councilZonesDataCache[activeZoneId]);
-                    displayOrUpdateCouncilZone(activeZoneId, councilZonesDataCache[activeZoneId]); // Pass index and zone data (which is an array of candidates)
+                    displayOrUpdateCouncilZone(activeZoneId, councilZonesDataCache[activeZoneId]);
                     const activeTabButton = councilZoneButtonsContainer.querySelector(`.zone-tab-button[data-zone-id="${activeZoneId}"]`);
                     if (activeTabButton) {
                         setActiveTab(activeTabButton);
@@ -179,19 +173,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function displayZoneTabs(zoneIndices) { // Parameter is now an array of indices
+    function displayZoneTabs(zoneIndices) {
         if (!councilZoneButtonsContainer) return;
         councilZoneButtonsContainer.innerHTML = '';
         console.log("displayZoneTabs called with zoneIndices:", zoneIndices);
         const fragment = document.createDocumentFragment();
         zoneIndices.forEach((zoneIndex) => {
-            const zoneName = `เขต ${zoneIndex}`; // Zone index starts from 1
+            const zoneName = `เขต ${zoneIndex}`;
             const button = document.createElement('button');
             button.className = 'zone-tab-button';
             button.textContent = zoneName;
-            button.dataset.zoneId = zoneIndex; // Store the index
+            button.dataset.zoneId = zoneIndex;
             button.onclick = function() {
-                activeZoneId = zoneIndex; // Update activeZoneId to the index
+                activeZoneId = zoneIndex;
                 const currentZoneCandidatesArray = councilZonesDataCache[activeZoneId];
                 if (currentZoneCandidatesArray) {
                     console.log("Zone tab clicked, displaying zone with index:", activeZoneId);
@@ -216,8 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // zoneIndex is the index from the 'zones' array (e.g., 1, 2, 3)
-    // candidatesInZoneArray is the array of candidate objects for that specific zone
     function displayOrUpdateCouncilZone(zoneIndex, candidatesInZoneArray) {
         if (!councilZoneContentsContainer) return;
         console.log(`displayOrUpdateCouncilZone called for zoneIndex: ${zoneIndex}`, "with candidates array:", candidatesInZoneArray);
@@ -229,13 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let candidatesToDisplay = [...candidatesInZoneArray]; // Create a shallow copy
+        let candidatesToDisplay = [...candidatesInZoneArray];
         console.log("Candidates array for display (original order from Firebase):", JSON.parse(JSON.stringify(candidatesToDisplay)));
-
-        // Since 'number' is not available in the JSON for council members,
-        // we will display them in the order they appear in the array.
-        // The original request was to keep the order fixed, which this achieves by not sorting
-        // if 'number' is absent or if sorting by 'number' is not desired.
 
         councilZoneContentsContainer.innerHTML = '';
         const table = document.createElement('table');
@@ -252,9 +239,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = table.createTBody();
         candidatesToDisplay.forEach((candidate, index) => {
             const row = tbody.insertRow();
+            
+            // **** START: Animation Logic for Council Member Rows ****
+            row.classList.add('candidate-row');
+            // Trigger visibility for animation after a short delay to ensure transition works
+            // Stagger animation slightly for each row
+            setTimeout(() => {
+                row.classList.add('visible');
+            }, 50 * index); 
+            // **** END: Animation Logic for Council Member Rows ****
 
             const cellNumber = row.insertCell();
-            // Use candidate.number if it exists in your data, otherwise use index + 1
             cellNumber.textContent = candidate.number || (index + 1).toString();
             cellNumber.className = 'px-2 sm:px-4 py-2 whitespace-nowrap';
 
@@ -276,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadVoterStats() {
-        const statsRef = database.ref('electionStats'); // Corrected path to 'electionStats'
+        const statsRef = database.ref('electionStats');
         console.log("Attaching Firebase listener for electionStats.");
         statsRef.on('value', (snapshot) => {
             console.log("Firebase 'electionStats' data received snapshot:", snapshot);
@@ -338,16 +333,15 @@ function loadAdminMayorList() {
     const adminMayorList = document.getElementById('admin-mayor-list');
     if (!adminMayorList) return;
 
-    database.ref('mayors').on('value', snapshot => { // Path 'mayors'
+    database.ref('mayors').on('value', snapshot => {
         adminMayorList.innerHTML = '';
-        const mayors = snapshot.val(); // Expecting an array
+        const mayors = snapshot.val();
         if (Array.isArray(mayors)) {
-            // Sort by number if 'number' field exists and is parseable
             const sortedMayorsAdmin = [...mayors].sort((a,b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
             
-            sortedMayorsAdmin.forEach((mayor, index) => { // Use index for unique IDs if 'number' isn't reliable
-                const mayorIdForAdmin = mayor.number || index; // Use number or index for unique element ID
-                const dbPathForMayorScore = `mayors/${index}/score`; // Path to update score in the array
+            sortedMayorsAdmin.forEach((mayor, index) => {
+                const mayorIdForAdmin = mayor.number || index;
+                const dbPathForMayorScore = `mayors/${index}/score`;
 
                 const div = document.createElement('div');
                 div.className = 'p-3 border rounded-md bg-gray-50 flex items-center justify-between';
@@ -368,39 +362,37 @@ function loadAdminMayorList() {
 
 function loadAdminCouncilZoneTabs() {
     const zoneTabsContainer = document.getElementById('zone-tabs');
-    let previouslySelectedAdminZoneId = null; // Variable to store the last selected zone ID (index)
+    let previouslySelectedAdminZoneId = null;
     if (!zoneTabsContainer) return;
 
-    database.ref('zones').on('value', snapshot => { // Path 'zones'
-        // Before clearing, check if there was a previously selected tab
+    database.ref('zones').on('value', snapshot => {
         const currentActiveTab = zoneTabsContainer.querySelector('.admin-zone-tab.bg-indigo-100');
         if (currentActiveTab) {
             previouslySelectedAdminZoneId = currentActiveTab.dataset.zoneId;
         }
 
-        zoneTabsContainer.innerHTML = ''; // Clear existing tabs
-        const zonesArray = snapshot.val(); // This is an array: [null, zone1Array, zone2Array, ...]
+        zoneTabsContainer.innerHTML = '';
+        const zonesArray = snapshot.val();
         
         if (Array.isArray(zonesArray) && zonesArray.length > 1) {
-            for (let i = 1; i < zonesArray.length; i++) { // Start from index 1
-                if (!zonesArray[i]) continue; // Skip if a zone entry is unexpectedly null
+            for (let i = 1; i < zonesArray.length; i++) {
+                if (!zonesArray[i]) continue;
 
-                const zoneAdminId = i; // Use index as the ID for admin purposes
+                const zoneAdminId = i;
                 const zoneAdminName = `เขต ${i}`;
 
                 const button = document.createElement('button');
                 button.className = 'admin-zone-tab px-3 py-1.5 border rounded-md text-sm hover:bg-indigo-100';
                 button.textContent = zoneAdminName;
-                button.dataset.zoneId = zoneAdminId.toString(); // Store index as string
+                button.dataset.zoneId = zoneAdminId.toString();
                 button.onclick = (e) => {
-                    loadAdminCouncilCandidatesForZone(zoneAdminId); // Pass the index
+                    loadAdminCouncilCandidatesForZone(zoneAdminId);
                     document.querySelectorAll('.admin-zone-tab').forEach(btn => btn.classList.remove('bg-indigo-100', 'font-semibold'));
                     e.target.classList.add('bg-indigo-100', 'font-semibold');
                 };
                 zoneTabsContainer.appendChild(button);
             }
 
-            // Restore selection or default to first tab
             let tabToSelectId = previouslySelectedAdminZoneId || (zonesArray.length > 1 && zonesArray[1] ? '1' : null);
 
             if (tabToSelectId) {
@@ -408,7 +400,7 @@ function loadAdminCouncilZoneTabs() {
                 if (tabToSelect) {
                     loadAdminCouncilCandidatesForZone(parseInt(tabToSelectId, 10));
                     tabToSelect.classList.add('bg-indigo-100', 'font-semibold');
-                } else if (zonesArray.length > 1 && zonesArray[1]) { // Fallback if previous selection is no longer valid
+                } else if (zonesArray.length > 1 && zonesArray[1]) {
                     loadAdminCouncilCandidatesForZone(1);
                     const firstFallbackTab = zoneTabsContainer.querySelector('.admin-zone-tab[data-zone-id="1"]');
                     if (firstFallbackTab) {
@@ -422,17 +414,17 @@ function loadAdminCouncilZoneTabs() {
     });
 }
 
-function loadAdminCouncilCandidatesForZone(zoneIndex) { // Parameter is now zoneIndex
+function loadAdminCouncilCandidatesForZone(zoneIndex) {
     const adminZoneContent = document.getElementById('admin-zone-content');
     if (!adminZoneContent) return;
 
-    database.ref(`zones/${zoneIndex}`).on('value', snapshot => { // Path to candidates for a specific zone index
+    database.ref(`zones/${zoneIndex}`).on('value', snapshot => {
         adminZoneContent.innerHTML = '';
-        const candidatesArrayForZone = snapshot.val(); // This is an array of candidate objects
+        const candidatesArrayForZone = snapshot.val();
 
         if (Array.isArray(candidatesArrayForZone)) {
             candidatesArrayForZone.forEach((candidate, candidateIndex) => {
-                const candidateIdInArray = candidateIndex; // Use array index as part of the ID
+                const candidateIdInArray = candidateIndex;
                 const dbPathForCouncilScore = `zones/${zoneIndex}/${candidateIdInArray}/score`;
 
                 const div = document.createElement('div');
@@ -453,7 +445,7 @@ function loadAdminCouncilCandidatesForZone(zoneIndex) { // Parameter is now zone
 }
 
 function loadAdminElectionStats() {
-    const statsRef = database.ref('electionStats'); // Corrected path
+    const statsRef = database.ref('electionStats');
     statsRef.once('value', (snapshot) => {
         const stats = snapshot.val();
         if (stats) {
@@ -463,7 +455,7 @@ function loadAdminElectionStats() {
                 if (inputElement && typeof stats[field] !== 'undefined' && stats[field] !== null) {
                     inputElement.value = stats[field];
                 } else if (inputElement) {
-                    inputElement.value = ''; // Clear if null or undefined
+                    inputElement.value = '';
                 }
             });
         }
@@ -479,7 +471,7 @@ function updateScore(dbPath, inputElementId) {
     const value = inputElement.value;
     let numericValue;
     if (value === '') {
-        numericValue = 0; // Or null, depending on how you want to store empty scores
+        numericValue = 0;
     } else if (isNaN(parseInt(value))) {
         alert('กรุณาป้อนค่าเป็นตัวเลข');
         inputElement.style.borderColor = 'red';
@@ -489,11 +481,10 @@ function updateScore(dbPath, inputElementId) {
         numericValue = parseInt(value, 10);
     }
 
-    inputElement.style.borderColor = ''; // Clear previous error/success states
+    inputElement.style.borderColor = '';
 
     database.ref(dbPath).set(numericValue)
         .then(() => {
-            // console.log(`Updated ${dbPath} to ${numericValue}`);
             inputElement.style.borderColor = 'green';
             setTimeout(() => { inputElement.style.borderColor = ''; }, 1500);
         })
@@ -506,7 +497,7 @@ function updateScore(dbPath, inputElementId) {
 
 function updateElectionStat(statName) {
     const inputElementId = `admin-${statName}`;
-    const dbPath = `electionStats/${statName}`; // Corrected path
+    const dbPath = `electionStats/${statName}`;
     updateScore(dbPath, inputElementId);
 }
 

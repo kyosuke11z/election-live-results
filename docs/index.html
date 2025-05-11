@@ -88,10 +88,20 @@
             font-weight: 700; 
         }
 
+        /* CSS for S.T. Candidate Row Animation (Re-added) */
+        .candidate-row {
+            opacity: 0;
+            transform: translateX(-20px); /* Slight slide-in from left */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .candidate-row.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
         /* Custom style for S.T. table data cells font size */
         #zone-contents .table-official td {
-            font-size: 1.5rem; /* เทียบเท่า text-lg ของ Tailwind (18px), ปรับค่าได้ตามต้องการ */
-            /* อาจจะต้องปรับ padding เล็กน้อยถ้าตัวอักษรดูอึดอัดไป */
+            font-size: 1.5rem; 
         }
     </style>
 </head>
