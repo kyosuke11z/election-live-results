@@ -99,12 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // If you have a local 'img_placeholder_person.png' in the same folder as index.html, you can use that.
             const placeholderImage = 'img_placeholder_person.png'; // Or 'YOUR_DEFAULT_EXTERNAL_IMAGE_URL.jpg'
             div.innerHTML = `
-                <img src="${mayor.imageUrl || placeholderImage}" alt="${mayor.name || 'ผู้สมัคร'}" class="rounded-full w-24 h-24 md:w-32 md:h-32 object-cover mb-3 border-4 border-blue-300" onerror="this.onerror=null;this.src='${placeholderImage}';">
-                <h3 class="text-md md:text-lg font-semibold text-gray-800">${mayor.name || 'N/A'}</h3>
-                <p class="mayor-number-display text-2xl md:text-3xl">${mayor.number || '-'}</p>
-                <p class="text-xs md:text-sm text-gray-600 mb-1">${mayor.party || ''}</p>
-                <div class="score-value font-bold text-blue-700 text-3xl md:text-4xl mt-2">${(mayor.score || 0).toLocaleString()}</div>
+                <img src="${mayor.imageUrl || placeholderImage}" alt="${mayor.name || 'ผู้สมัคร'}" class="rounded-full w-24 h-24 md:w-32 md:h-32 object-cover mb-4 border-4 border-blue-300" onerror="this.onerror=null;this.src='${placeholderImage}';">
+                <h3 class="text-md md:text-lg font-semibold text-gray-800 mb-1">${mayor.name || 'N/A'}</h3>
+                <p class="text-xs text-gray-500">หมายเลข</p>
+                <p class="mayor-number-display text-2xl md:text-3xl mb-2">${mayor.number || '-'}</p>
+                <p class="text-xs md:text-sm text-gray-600 mb-2">${mayor.party || ''}</p> 
                 <p class="text-xs text-gray-500">คะแนน</p>
+                <div class="score-value font-bold text-blue-700 text-3xl md:text-4xl">${(mayor.score || 0).toLocaleString()}</div>
             `;
             fragment.appendChild(div);
         });
